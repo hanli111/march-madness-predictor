@@ -146,3 +146,28 @@ class FeatureEngineering:
         )
         
         return matchup_df
+    
+    # determines the difference in features between team 1 and team 2
+    def create_difference_features(self, matchup_df):
+        matchup_df = matchup_df.copy()
+        
+        base_features = [
+            'BADJ EM', 'BADJ O', 'BADJ D',
+            'EFG%', 'EFG%D', '3PT%', '3PT%D',
+            'FTR', 'FTRD', 'TOV%', 'TOV%D',
+            'OREB%', 'DREB%', 'AST%',
+            'Q1 PLUS Q2 W', 'ELO', 'NET RPI',
+            'TR RATING', 'SOS RANK', 'LUCK RANK', 'CONSISTENCY RANK',
+            'V 1-25 WINS'
+        ]
+        
+        # go through all the features
+        for feature in base_features:
+            col_t1 = f'{feature}_T1'
+            col_t2 = f'{feature}_T2'
+            
+            if col_t1 in matchup_df.columns and col_t2 in matchup_df.columns:
+                # get the difference
+                matchup_df[f'{feature}_DIFF'] = matchup_df[col_t1] - matchup_df[col_t2]
+        
+        return matchup_df

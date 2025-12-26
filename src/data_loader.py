@@ -17,7 +17,7 @@ def load_team_rankings():
     return pd.read_csv(os.path.join(RAW_DATA_PATH, "team_rankings.csv"))
 
 # loads TM dataset
-def load_team_matchups():
+def load_tournament_matchups():
     return pd.read_csv(os.path.join(RAW_DATA_PATH, "tournament_matchups.csv"))
 
 # loads all the datasets (returns a dictionary of all raw datasets)
@@ -26,5 +26,5 @@ def load_all_datasets():
         "kenpom_barttorvik": load_kenpom_barttorvik(),
         "resumes": load_resumes(),
         "team_rankings": load_team_rankings(),
-        "team_matchups": load_team_matchups()
+        "tournament_matchups": load_tournament_matchups()
     }

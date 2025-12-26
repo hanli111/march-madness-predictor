@@ -58,7 +58,7 @@ class FeatureEngineering:
         return kenpom_bart
     
     # creates pairs of teams that simulate two teams playing each other and determines a winner between the two teams
-    def create_matchups(self):
+    def create_matchup_pairs(self):
         matchups = self.tournament_matchups.copy()
         matchup_pairs = []
 
@@ -106,4 +106,43 @@ class FeatureEngineering:
                         'WINNER': winner
                     })
         matchup_df = pd.DataFrame(matchup_pairs)
+        return matchup_df
+    
+    # combines the matchup pairs with both teams' stats
+    def create_matchup_features(self):
+        team_features = self.combine_into_one_dataset()
+        matchup_df = self.create_matchup_pairs()
+
+        # align column names for merging
+        matchup_df = matchup_df.rename(columns={
+            'TEAM_1_NAME': 'TEAM1',
+            'TEAM_2_NAME': 'TEAM2'
+        })
+
+        # rename team_features columns for team 1
+        team_1_features = team_features.copy()
+        team_1_cols = {col: f'{col}_T1' for col in team_1_features.columns if col not in ['YEAR', 'TEAM']}
+        team_1_features = team_1_features.rename(columns=team_1_cols)
+        team_1_features = team_1_features.rename(columns={'TEAM': 'TEAM1'})
+        
+        # merge team 1's features
+        matchup_df = matchup_df.merge(
+            team_1_features[['YEAR', 'TEAM1'] + [col for col in team_1_features.columns if '_T1' in col]],
+            on=['YEAR', 'TEAM1'],
+            how='left'
+        )
+        
+        # rename team_features columns for team 2
+        team_2_features = team_features.copy()
+        team_2_cols = {col: f'{col}_T2' for col in team_2_features.columns if col not in ['YEAR', 'TEAM']}
+        team_2_features = team_2_features.rename(columns=team_2_cols)
+        team_2_features = team_2_features.rename(columns={'TEAM': 'TEAM2'})
+        
+        # merge team 2's features
+        matchup_df = matchup_df.merge(
+            team_2_features[['YEAR', 'TEAM2'] + [col for col in team_2_features.columns if '_T2' in col]],
+            on=['YEAR', 'TEAM2'],
+            how='left'
+        )
+        
         return matchup_df

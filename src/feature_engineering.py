@@ -171,3 +171,22 @@ class FeatureEngineering:
                 matchup_df[f'{feature}_DIFF'] = matchup_df[col_t1] - matchup_df[col_t2]
         
         return matchup_df
+    
+    # prepares final training dataset with X = features and y = labels
+    def prepare_training_data(self):
+        # creates matchup features
+        matchup_df = self.create_matchup_features()
+        
+        # creates difference features
+        matchup_df = self.create_difference_features(matchup_df)
+        
+        # extracts the feature columns
+        feature_cols = [col for col in matchup_df.columns if '_DIFF' in col]
+        
+        X = matchup_df[feature_cols].copy()
+        y = matchup_df['WINNER'].copy()
+        
+        # handles missing values
+        X = X.fillna(X.mean())
+        
+        return X, y, matchup_df
